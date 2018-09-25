@@ -378,7 +378,10 @@ class User extends Base
      * @param 
      * @return 
      *******************************************/
-    pubf
+    public function functionName()
+    {
+        
+    }
 
 
 }
