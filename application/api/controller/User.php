@@ -384,6 +384,91 @@ class User extends Base
 
     }
 
+    /********************************************
+     * @purpose
+     * @date 2018/9/26 10:47
+     * @param
+     * @return
+     *******************************************/
+    public function userInfoAuth()
+    {
+        $redirect_url= 'www.baidu.com';
+        $appid = 'wx73a44bbd78e9cf99';
+        $appsecret = '719d166b9016ca2237fbb358c5698bd4';
+        //1.准备scope为snsapi_userInfo网页授权页面
+        $redirecturl = urlencode($redirect_url);
+        $snsapi_userInfo_url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid='.$appid.'&redirect_uri='.$redirect_url.'&response_type=code&scope=snsapi_userinfo&state=YQJ#wechat_redirect';
+
+//        https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx73a44bbd78e9cf99&redirect_uri=www.baidu.com&response_type=code&scope=snsapi_userinfo&state=YQJ#wechat_redirect
+
+        //2.用户手动同意授权,同意之后,获取code
+        //页面跳转至redirect_uri/?code=CODE&state=STATE
+        $code = $_GET['code'];
+        if( !isset($code) ){
+            header('Location:'.$snsapi_userInfo_url);
+        }
+
+        //3.通过code换取网页授权access_token
+        $curl = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid='.$appid.'&secret='.$appsecret.'&code='.$code.'&grant_type=authorization_code';
+        $content = $this->urlrequest($curl);
+        $result = json_decode($content);
+
+        //4.通过access_token和openid拉取用户信息
+        $webAccess_token = $result->access_token;
+        $openid = $result->openid;
+        $userInfourl = 'https://api.weixin.qq.com/sns/userinfo?access_token='.$webAccess_token.'&openid='.$openid.'&lang=zh_CN ';
+
+        $recontent = $this->urlrequest($userInfourl);
+        $userInfo = json_decode($recontent,true);
+        return $userInfo;
+    }
+    /********************************************
+     * @purpose
+     * @date 2018/9/26 10:47
+     * @param
+     * @return
+     *******************************************/
+    //设置网络请求配置
+    function urlrequest($curl,$https=true,$method='GET',$data=null)
+    {
+        //1.创建一个新cURL资源
+        $ch = curl_init();
+
+        //2.设置URL和相应的选项
+        //要访问的网站
+        curl_setopt($ch, CURLOPT_URL, $curl);
+        //启用时会将头文件的信息作为数据流输出。
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        //将curl_exec()获取的信息以字符串返回，而不是直接输出。
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        if($https){
+            //FALSE 禁止 cURL 验证对等证书（peer's certificate）。
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);  //验证主机
+        }
+        if($method == 'POST'){
+            //发送 POST 请求
+            curl_setopt($ch, CURLOPT_POST, true);
+            //全部数据使用HTTP协议中的 "POST" 操作来发送。
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        }
+
+        //3.抓取URL并把它传递给浏览器
+        $content = curl_exec($ch);
+        if ($content  === false) {
+            return "网络请求出错: " . curl_error($ch);
+            exit();
+        }
+
+        //4.关闭cURL资源，并且释放系统资源
+        curl_close($ch);
+
+        return $content;
+    }
+
+
+
 
 }
         
