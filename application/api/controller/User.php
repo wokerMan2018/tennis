@@ -381,7 +381,7 @@ class User extends Base
      *******************************************/
 
 
-    public function functionName()
+    public function functionNameHello()
     {
 
     }
