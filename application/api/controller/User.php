@@ -100,8 +100,8 @@ class User extends Base
     {
         $this->auth(false);
         $user = $this->user;
-        $organization = Organization::where(['uid'=>$user->id])->find();
-        responseJSON(200,'返回机构信息',$organization);
+        $organization = Organization::where(['uid' => $user->id])->find();
+        responseJSON(200, '返回机构信息', $organization);
     }
 
     /********************************************
@@ -266,7 +266,7 @@ class User extends Base
                 responseJSON(400, $info->getError());
             }
             if (Referee::where(['uid' => $userInfo->id])->find()) {
-                $bool = Referee::where(['uid'=>$userInfo->id])->update([
+                $bool = Referee::where(['uid' => $userInfo->id])->update([
                     'referee_description' => $postData['referee_description'],
                     'referee_certificate' => $postData['referee_certificate']
                 ]);
@@ -326,7 +326,7 @@ class User extends Base
             $logo = $logo->move('./uploads/cert');
             $organization_certificate = Request::file('organization_certificate');
             $organization_certificate = $organization_certificate->move('./uploads/cert');
-            $message = array('organization_certificateError'=>'','logoError'=>'');
+            $message = array('organization_certificateError' => '', 'logoError' => '');
             if ($logo) {
                 $postData['logo'] = '/public/uploads/cert/' . str_replace('\\', '/', $logo->getSaveName());
             } else {
@@ -339,7 +339,7 @@ class User extends Base
             }
             if (!$message['logoError'] AND !$message['organization_certificateError']) {
                 if (Organization::where(['uid' => $user->id])->find()) {
-                    $orga = Organization::where(['uid'=>$userInfo->id])->update([
+                    $orga = Organization::where(['uid' => $userInfo->id])->update([
                         'name' => $postData['name'],
                         'head_name' => $postData['head_name'],
                         'head_phone' => $postData['head_phone'],
@@ -372,17 +372,18 @@ class User extends Base
 
 
     }
+
     /********************************************
-     * @purpose   
+     * @purpose
      * @date 2018/9/25 14:39
-     * @param 
-     * @return 
+     * @param
+     * @return
      *******************************************/
+
+
     public function nextFunction()
     {
-        
+
     }
-        
-
-
 }
+        
